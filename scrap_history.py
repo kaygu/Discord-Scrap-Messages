@@ -5,6 +5,7 @@ import os
 import discord
 
 DEFAULT_FOLDER_NAME = "logs"
+CSV_SEP = "\t"
 
 client = discord.Client()
 
@@ -12,28 +13,28 @@ with open('config.json') as f:
     config = json.load(f)
 
 def save_line(out, message):
+    #TODO: Escape special characters
+    #TODO: Change embeds & attachements to lists
     lines = []
     lines.append("{0}".format(message.author.name))
     lines.append("{0}".format(message.author.id))
     lines.append("{0}".format(message.created_at))
     lines.append("{0}".format(message.id))
     lines.append("{0}".format(message.content))
-    atc_line = ""
+    atc_line = []
     if message.attachments:
-        for atch in message.attachments[:-1]:
-            atc_line += atch.url + ", "
-        atc_line += message.attachments[-1].url
-    lines.append(atc_line)
-    embed_line = ""
+        for atch in message.attachments:
+            atc_line.append(atch.url)
+    lines.append(json.dumps(atc_line))
+    embed_line = []
     if message.embeds:
-        for embed in message.embeds[:-1]:
-            embed_line += str(embed.to_dict()) + ", "
-        embed_line += str(message.embeds[-1].to_dict())
-    lines.append(embed_line)
+        for embed in message.embeds:
+            embed_line.append(embed.to_dict())
+    lines.append(json.dumps(embed_line))
      
 
     for line in lines:
-        out.write(line + ";")
+        out.write(line + CSV_SEP)
     out.write('\n')
     
 
@@ -76,16 +77,18 @@ async def on_ready():
     channel_ids = config.get("channels")
     channels = []
     try:
-        guild = client.get_guild(guild_id)
-        if not guild:
-            raise Exception("Guild ID is invalid")
-        channels = guild.text_channels
-        for channel_id in channel_ids:
-            channel = client.get_channel(channel_id)
-            if not channel:
-                raise Exception("Channel ID is invalid")
-            if channel not in channels:
-                channels.append(channel)
+        if guild_id:
+            guild = client.get_guild(guild_id)
+            if not guild:
+                raise Exception("Guild ID is invalid")
+            channels = guild.text_channels
+        if channel_ids:
+            for channel_id in channel_ids:
+                channel = client.get_channel(channel_id)
+                if not channel:
+                    raise Exception("Channel ID is invalid")
+                if channel not in channels:
+                    channels.append(channel)
         for channel in channels:
             await get_logs(channel)
     except Exception as e:
