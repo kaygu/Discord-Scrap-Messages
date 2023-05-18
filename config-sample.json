@@ -1,6 +1,9 @@
 {
   "token": "my-personal-auth-token",
-  "guild": "if you want to get the history of the whole server put a server id here (int value)",
+  "guilds":[
+    "if you want to get the history of the whole server",
+    "put a server ids here (int value)"
+  ],
   "channels":[
     "if you want to get history of certain channels",
     "put the channel ids here",
