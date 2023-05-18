@@ -2,11 +2,12 @@
   "token": "my-personal-auth-token",
   "guild": "if you want to get the history of the whole server put a server id here (int value)",
   "channels":[
-    "channel-ids",
-    "of the channels",
-    "you want the history of",
-    "these should be int values"
+    "if you want to get history of certain channels",
+    "put the channel ids here",
+    "one per line",
+    "(int values)"
   ],
   "amount": null,
-  "log_folder": "logs"
+  "log_folder": "logs",
+  "csv_separator": "\t"
 }
